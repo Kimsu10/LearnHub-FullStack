@@ -81,7 +81,7 @@ public class StudentDashBoardController {
     }
 
     // 최근 학습 강의
-    @GetMapping("/recentLecture")
+    @GetMapping("/recent-lecture")
     public ResponseEntity<?> viewRecentLecture(Principal principal) {
         Optional<ViewRecentStudyLectureDto> myRecentLecture = lectureService.getRecentLecture(principal.getName());
 
@@ -102,9 +102,7 @@ public class StudentDashBoardController {
     // 과제 목록
     @GetMapping("/homeworks")
     public ResponseEntity<?> viewHomeworkTop2(Principal principal) {
-
         List<ViewHomeworkDto> myHomeworks = studentHomeworkService.getHomeworkTop2(principal.getName());
-
         if (myHomeworks != null) {
             return new ResponseEntity<>(myHomeworks, HttpStatus.OK);
         }

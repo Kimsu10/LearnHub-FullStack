@@ -37,12 +37,12 @@ import static project.homelearn.config.storage.FolderType.HOMEWORK;
 @RequiredArgsConstructor
 public class StudentHomeworkService {
 
+    private final BadgeService badgeService;
     private final StorageService storageService;
     private final StudentRepository studentRepository;
     private final HomeworkRepository homeworkRepository;
-    private final StudentHomeworkRepository studentHomeworkRepository;
     private final CurriculumRepository curriculumRepository;
-    private final BadgeService badgeService;
+    private final StudentHomeworkRepository studentHomeworkRepository;
 
     public boolean submitHomework(String username, HomeworkSubmitDto homeWorkSubmitDto) {
         try {
@@ -164,9 +164,12 @@ public class StudentHomeworkService {
             return false;
         }
     }
-    // 미제출우선 최근 2개 과제
-    public List<ViewHomeworkDto> getHomeworkTop2(String username){
-        return homeworkRepository.findHomeworkTop2(username);
+
+    // 최근 2개 과제
+    public List<ViewHomeworkDto> getHomeworkTop2(String username) {
+        Curriculum curriculum = curriculumRepository.findCurriculumByUsername(username);
+        Student student = studentRepository.findByUsername(username);
+        return homeworkRepository.findHomeworkTop2(curriculum, student);
     }
 
     // 진행중인 과제 페이지 리스트 - 마감기한 기준 오름 차순
@@ -204,7 +207,7 @@ public class StudentHomeworkService {
     }
 
     // 과제 상세보기
-    public StudentHomeworkDetailDto getHomeworkDetail(Long homeworkId){
+    public StudentHomeworkDetailDto getHomeworkDetail(Long homeworkId) {
         Homework homework = homeworkRepository.findById(homeworkId).orElseThrow();
 
         return new StudentHomeworkDetailDto(
@@ -221,9 +224,8 @@ public class StudentHomeworkService {
     }
 
     // 내 제출 내역 확인
-    public MySubmitDetailDto getMySubmit(Long homeworkId){
+    public MySubmitDetailDto getMySubmit(Long homeworkId) {
         StudentHomework myHomework = studentHomeworkRepository.findByHomeworkId(homeworkId);
-
         return new MySubmitDetailDto(
                 myHomework.getId(),
                 myHomework.getDescription(),
@@ -234,5 +236,4 @@ public class StudentHomeworkService {
                 myHomework.getResponseDate()
         );
     }
-
 }

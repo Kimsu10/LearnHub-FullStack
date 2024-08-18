@@ -6,13 +6,14 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
-import project.homelearn.dto.student.dashboard.QViewHomeworkDto;
 import project.homelearn.dto.student.dashboard.ViewHomeworkDto;
 import project.homelearn.dto.teacher.dashboard.HomeworkStateDto;
 import project.homelearn.dto.teacher.homework.HomeworkDetailDto;
 import project.homelearn.dto.teacher.homework.HomeworkSubmitListDto;
 import project.homelearn.dto.teacher.homework.HomeworkTabDto;
 import project.homelearn.entity.curriculum.Curriculum;
+import project.homelearn.entity.user.User;
+import project.homelearn.repository.homework.StudentHomeworkRepository;
 import project.homelearn.repository.user.StudentRepository;
 
 import java.time.LocalDateTime;
@@ -22,13 +23,13 @@ import java.util.stream.Collectors;
 
 import static project.homelearn.entity.homework.QHomework.homework;
 import static project.homelearn.entity.homework.QStudentHomework.studentHomework;
-import static project.homelearn.entity.user.QUser.user;
 
 @RequiredArgsConstructor
 public class HomeworkRepositoryImpl implements HomeworkRepositoryCustom {
 
     private final JPAQueryFactory queryFactory;
     private final StudentRepository studentRepository;
+    private final StudentHomeworkRepository studentHomeworkRepository;
 
     @Override
     public HomeworkStateDto findHomeworkStateDto(Curriculum curriculum, Integer totalCount) {
@@ -208,23 +209,31 @@ public class HomeworkRepositoryImpl implements HomeworkRepositoryCustom {
     }
 
     @Override
-    public List<ViewHomeworkDto> findHomeworkTop2(String username){
-        return queryFactory
-                .select(new QViewHomeworkDto(
-                        homework.id,
-                        homework.title,
-                        homework.description,
-                        homework.deadline,
-                        studentHomework.isNotNull()
-                ))
+    public List<ViewHomeworkDto> findHomeworkTop2(Curriculum curriculum, User student) {
+        List<ViewHomeworkDto> result = new ArrayList<>();
+
+        List<Tuple> tuples = queryFactory
+                .select(homework.id, homework.title, homework.description, homework.deadline)
                 .from(homework)
-                .leftJoin(studentHomework)
-                .on(homework.eq(studentHomework.homework)
-                        .and(studentHomework.user.username.eq(username)))
-                .where(studentHomework.isNull()
-                        .and(homework.curriculum.eq(user.curriculum)))
-                .orderBy(homework.deadline.desc())
+                .where(homework.curriculum.eq(curriculum))
+                .orderBy(homework.createdDate.desc())
                 .limit(2)
                 .fetch();
+
+        for (Tuple tuple : tuples) {
+            Long homeworkId = tuple.get(homework.id);
+            ViewHomeworkDto homeworkDto = new ViewHomeworkDto(
+                    homeworkId,
+                    tuple.get(homework.title),
+                    tuple.get(homework.description),
+                    tuple.get(homework.deadline)
+            );
+
+            boolean exists = studentHomeworkRepository.existsByStudentAndHomeworkId(student, homeworkId);
+            homeworkDto.setSubmit(exists);
+            result.add(homeworkDto);
+        }
+
+        return result;
     }
 }
