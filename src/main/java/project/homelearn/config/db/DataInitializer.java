@@ -27,7 +27,8 @@ public class DataInitializer implements CommandLineRunner {
     private final BCryptPasswordEncoder passwordEncoder;
     private final BadgeRepository badgeRepository;
 
-    public DataInitializer(@Value("${manager.password}") String password, UserRepository userRepository, SurveyContentRepository surveyContentRepository, BCryptPasswordEncoder passwordEncoder, BadgeRepository badgeRepository) {
+    //
+    public DataInitializer(@Value("${initial.password}") String password, UserRepository userRepository, SurveyContentRepository surveyContentRepository, BCryptPasswordEncoder passwordEncoder, BadgeRepository badgeRepository) {
         this.password = password;
         this.userRepository = userRepository;
         this.surveyContentRepository = surveyContentRepository;

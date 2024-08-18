@@ -32,11 +32,6 @@ public class StudentVoteService {
     private final VoteContentRepository voteContentRepository;
     private final StudentVoteRepository studentVoteRepository;
 
-    public boolean isParticipate(Long voteId, String username) {
-        Student student = studentRepository.findByUsername(username);
-        return studentVoteRepository.isParticipate(voteId, student);
-    }
-
     public StudentVoteViewDto getStudentVoteView(Long voteId, String username) {
         Curriculum curriculum = curriculumRepository.findCurriculumByUsername(username);
         Integer total = studentRepository.findStudentCountByCurriculum(curriculum);
@@ -70,17 +65,18 @@ public class StudentVoteService {
             return true;
         }
 
-        boolean isMultipleChoice = vote.getIsMultipleChoice();
         long trueCount = voteResult.values().stream().filter(Boolean::booleanValue).count();
-
         if (trueCount == 0) {
             return true;
         }
 
-        if (!isMultipleChoice && trueCount > 1) {
-            return true;
-        }
-        return false;
+        boolean isMultipleChoice = vote.getIsMultipleChoice();
+        return !isMultipleChoice && trueCount > 1;
+    }
+
+    public boolean isParticipate(Long voteId, String username) {
+        Student student = studentRepository.findByUsername(username);
+        return studentVoteRepository.isParticipate(voteId, student);
     }
 
     private void saveVote(Map<Long, Boolean> voteResult, Student student, Vote vote) {
@@ -111,22 +107,16 @@ public class StudentVoteService {
         Student student = studentRepository.findByUsername(username);
         List<StudentVote> studentVotes = studentVoteRepository.findAllByVoteAndUser(vote, student);
 
+        deleteVote(studentVotes); // 기존 투표 삭제
+
+        // true count가 0이면 투표를 삭제하는 것으로 간주하고 바로 return
         if (trueCount == 0) {
-            deleteVote(studentVotes);
             return true;
         }
 
-        deleteVote(studentVotes);
+        // 새로운 투표 저장
         saveVote(voteResult, student, vote);
         return true;
-    }
-
-    private void deleteVote(List<StudentVote> studentVotes) {
-        for (StudentVote studentVote : studentVotes) {
-            VoteContent voteContent = studentVote.getVoteContent();
-            voteContent.setVoteCount(voteContent.getVoteCount() - 1);
-            studentVoteRepository.delete(studentVote);
-        }
     }
 
     private boolean validateModifyVote(Vote vote, long trueCount) {
@@ -137,10 +127,14 @@ public class StudentVoteService {
         }
 
         boolean isMultipleChoice = vote.getIsMultipleChoice();
+        return !isMultipleChoice && trueCount > 1;
+    }
 
-        if (!isMultipleChoice && trueCount > 1) {
-            return true;
+    private void deleteVote(List<StudentVote> studentVotes) {
+        for (StudentVote studentVote : studentVotes) {
+            VoteContent voteContent = studentVote.getVoteContent();
+            voteContent.setVoteCount(voteContent.getVoteCount() - 1);
+            studentVoteRepository.delete(studentVote);
         }
-        return false;
     }
 }

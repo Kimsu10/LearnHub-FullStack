@@ -15,7 +15,6 @@ import project.homelearn.repository.board.SubjectBoardRepository;
 import project.homelearn.repository.curriculum.CurriculumRepository;
 import project.homelearn.repository.curriculum.LectureRepository;
 import project.homelearn.repository.curriculum.SubjectRepository;
-import project.homelearn.repository.user.StudentRepository;
 import project.homelearn.repository.user.TeacherRepository;
 
 import java.util.List;
@@ -36,7 +35,6 @@ public class StudentSubjectService {
     private final LectureRepository lectureRepository;
     private final TeacherRepository teacherRepository;
     private final CurriculumRepository curriculumRepository;
-
 
     public SubjectBasicDto getSubjectBasic(Long subjectId) {
 
@@ -63,6 +61,7 @@ public class StudentSubjectService {
     }
 
     public SubjectBoardViewDto getSubjectBoard(Long boardId) {
+        subjectBoardRepository.increaseViewCount(boardId);
         return subjectBoardRepository.findSubjectBoard(boardId);
     }
 

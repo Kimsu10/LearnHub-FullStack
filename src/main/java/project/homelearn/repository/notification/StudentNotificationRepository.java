@@ -16,5 +16,8 @@ public interface StudentNotificationRepository extends JpaRepository<StudentNoti
     @Modifying
     void deleteAllByUser(User user);
 
+    @Modifying
+    void deleteByUserAndSurvey(User user, Survey survey);
+
     List<StudentNotification> findAllByUser(User user);
 }

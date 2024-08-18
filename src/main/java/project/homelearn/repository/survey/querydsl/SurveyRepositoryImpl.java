@@ -235,7 +235,7 @@ public class SurveyRepositoryImpl implements SurveyRepositoryCustom {
         List<String> textAnswers = queryFactory
                 .select(surveyAnswer.textAnswer)
                 .from(surveyAnswer)
-                .where(surveyAnswer.survey.id.eq(surveyId))
+                .where(surveyAnswer.survey.id.eq(surveyId), surveyAnswer.rating.isNull())
                 .offset(pageable.getOffset())
                 .limit(pageable.getPageSize())
                 .fetch();
@@ -249,7 +249,6 @@ public class SurveyRepositoryImpl implements SurveyRepositoryCustom {
         if (total == null) {
             total = 0L;
         }
-
         return new PageImpl<>(textAnswers, pageable, total);
     }
 
@@ -279,12 +278,3 @@ public class SurveyRepositoryImpl implements SurveyRepositoryCustom {
         return result;
     }
 }
-
-
-
-
-
-
-
-
-

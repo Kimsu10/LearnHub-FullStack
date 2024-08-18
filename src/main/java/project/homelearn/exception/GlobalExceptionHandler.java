@@ -41,12 +41,6 @@ public class GlobalExceptionHandler {
         return new ResponseEntity<>("Invalid signature", HttpStatus.UNAUTHORIZED);
     }
 
-    @ExceptionHandler(IllegalArgumentException.class)
-    public ResponseEntity<String> handleIllegalArgumentException(IllegalArgumentException ex) {
-        log.error("IllegalArgumentException: {}", ex.getMessage(), ex);
-        return new ResponseEntity<>("Invalid token", HttpStatus.BAD_REQUEST);
-    }
-
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<ErrorResponse> handleValidationExceptions(MethodArgumentNotValidException ex) {
         ErrorResponse errorResponse = new ErrorResponse();

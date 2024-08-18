@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.RestController;
 import project.homelearn.dto.common.account.EmailCodeDto;
 import project.homelearn.dto.common.account.EmailDto;
 import project.homelearn.dto.common.account.PasswordResetDto;
+import project.homelearn.service.common.RecaptchaService;
 import project.homelearn.service.common.UserService;
 
 /**
@@ -24,6 +25,7 @@ import project.homelearn.service.common.UserService;
 public class AccountController {
 
     private final UserService userService;
+    private final RecaptchaService recaptchaService;
 
     // 아이디 찾기
     @PostMapping("/find-id")
@@ -32,6 +34,7 @@ public class AccountController {
         if (result != null) {
             return new ResponseEntity<>(result, HttpStatus.OK);
         }
+        // 아이디를 못 찾은 경우
         return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
     }
 
@@ -42,6 +45,7 @@ public class AccountController {
         if (result) {
             return new ResponseEntity<>(HttpStatus.OK);
         }
+        // 이메일로 가입된 정보가 없을 경우
         return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
     }
 
@@ -50,14 +54,21 @@ public class AccountController {
     public ResponseEntity<?> verifyCode(@Valid @RequestBody EmailCodeDto emailCodeDto) {
         String username = userService.verifyCodeForResetPassword(emailCodeDto);
         if (username != null) {
+            // 코드가 유효한 경우 아이디 응답
             return new ResponseEntity<>(username, HttpStatus.OK);
         }
+        // 코드가 일치하지 않은 경우
         return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
     }
 
     // 비밀번호 재설정
     @PostMapping("/reset-password")
     public ResponseEntity<?> resetPassword(@Valid @RequestBody PasswordResetDto passwordResetDto) {
+//        boolean isHuman = recaptchaService.verifyRecaptcha(passwordResetDto.getRecaptchaToken());
+//        if (!isHuman) {
+//            return new ResponseEntity<>("봇입니다.", HttpStatus.BAD_REQUEST);
+//        }
+
         boolean result = userService.resetPassword(passwordResetDto);
         if (result) {
             return new ResponseEntity<>(HttpStatus.OK);

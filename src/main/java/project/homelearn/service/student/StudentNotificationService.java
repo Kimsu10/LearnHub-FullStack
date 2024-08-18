@@ -38,12 +38,14 @@ public class StudentNotificationService {
         }
     }
 
-    /*
-    매니저가 설문 마감 시 알림 삭제
-    설문 완료 시 알림 삭제
-     */
+    // 매니저가 설문 마감 시 알림 삭제
     public void deleteSurveyNotification(Survey survey) {
         notificationRepository.deleteAllBySurvey(survey);
+    }
+
+    // 설문 완료 시 알림 삭제
+    public void deleteSurveyNotification(Student student, Survey survey) {
+        notificationRepository.deleteByUserAndSurvey(student, survey);
     }
 
     // 과제 등록 시 학생들에게 알림

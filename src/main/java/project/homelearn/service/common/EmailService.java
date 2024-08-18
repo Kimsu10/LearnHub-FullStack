@@ -60,9 +60,6 @@ public class EmailService {
 
             // 이메일 전송
             javaMailSender.send(message);
-            log.info("toEmail = {}", to);
-            log.info("code = {}", code);
-
             return code;
         } catch (Exception e) {
             log.error("Error sending email", e);

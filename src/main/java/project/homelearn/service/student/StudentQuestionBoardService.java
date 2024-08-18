@@ -14,7 +14,6 @@ import project.homelearn.dto.common.board.QuestionBoardDto;
 import project.homelearn.dto.student.board.CommentWriteDto;
 import project.homelearn.dto.student.board.QuestionBoardWriteDto;
 import project.homelearn.dto.student.dashboard.ViewQuestionBoardDto;
-import project.homelearn.dto.teacher.dashboard.QuestionTop5Dto;
 import project.homelearn.entity.board.QuestionBoard;
 import project.homelearn.entity.board.comment.QuestionBoardComment;
 import project.homelearn.entity.board.scrap.QuestionScrap;
@@ -229,23 +228,21 @@ public class StudentQuestionBoardService {
         if (!writer.equals(username)) {
             return false;
         }
-
         reply.setContent(commentDto.getContent());
         return true;
     }
 
     // 댓글 수 증가
-    public void incrementCommentCount(Long questionBoardId){
+    public void incrementCommentCount(Long questionBoardId) {
         QuestionBoard questionBoard = questionBoardRepository.findById(questionBoardId).orElseThrow();
         questionBoard.setCommentCount(questionBoard.getCommentCount() + 1);
     }
 
     // 댓글 수 감소
-    public void decrementCommentCount(Long questionBoardId){
+    public void decrementCommentCount(Long questionBoardId) {
         QuestionBoard questionBoard = questionBoardRepository.findById(questionBoardId).orElseThrow();
         questionBoard.setCommentCount(questionBoard.getCommentCount() - 1);
     }
-
 
     // 질문 게시판 글 스크랩 = 나도 궁금해
     public boolean addScrap(String username, Long questionBoardId) {
@@ -256,10 +253,10 @@ public class StudentQuestionBoardService {
                 student,questionBoard
         );
 
-        if (questionScrapRepository.existByUserNameAndQuestionBoardId(username,questionBoardId)){
+        if (questionScrapRepository.existByUserNameAndQuestionBoardId(username,questionBoardId)) {
             return false;
         }
-        else{
+        else {
             questionScrapRepository.save(myScrap);
             return true;
         }
@@ -268,24 +265,22 @@ public class StudentQuestionBoardService {
     // 질문 게시판 글 스크랩 지우기
     public boolean deleteScrap(String username, Long questionBoardId) {
 
-        if(questionScrapRepository.existByUserNameAndQuestionBoardId(username,questionBoardId)){
+        if (questionScrapRepository.existByUserNameAndQuestionBoardId(username,questionBoardId)) {
             questionScrapRepository.deleteByUserNameAndQuestionBoardId(username,questionBoardId);
             return true;
         }
-        else{
+        else {
             return false;
         }
     }
 
-
     // 조회수 증가
-    public void incrementViewCount(Long questionBoardId){
-        QuestionBoard questionBoard = questionBoardRepository.findById(questionBoardId).orElseThrow();
-        questionBoard.setCommentCount(questionBoard.getViewCount() + 1);
+    public void incrementViewCount(Long questionBoardId) {
+        questionBoardRepository.incrementViewCountById(questionBoardId);
     }
 
-    //글 상세보기
-    public QuestionBoardDetailDto getQuestionBoard(Long questionBoardId){
+    // 글 상세 조회
+    public QuestionBoardDetailDto getQuestionBoard(Long questionBoardId) {
         QuestionBoard questionBoard = questionBoardRepository.findById(questionBoardId).orElseThrow();
 
         return new QuestionBoardDetailDto(
@@ -301,7 +296,7 @@ public class StudentQuestionBoardService {
     }
 
     // 댓글 뽑아오기
-    public List<QuestionBoardCommentDto> getQuestionBoardComment(Long questionBoardId){
+    public List<QuestionBoardCommentDto> getQuestionBoardComment(Long questionBoardId) {
         List<QuestionBoardComment> comments = commentRepository.findByQuestionBoardIdAndParentCommentIsNull(questionBoardId);
 
         return comments.stream()
@@ -310,7 +305,17 @@ public class StudentQuestionBoardService {
     }
 
     // 댓글 Dto 변환
-    public QuestionBoardCommentDto convertToCommentDto(QuestionBoardComment comment){
+    public QuestionBoardCommentDto convertToCommentDto(QuestionBoardComment comment) {
+        User user = comment.getUser();
+        if (user == null) {
+            return new QuestionBoardCommentDto(
+                    comment.getId(),
+                    "ChatGPT",
+                    comment.getContent(),
+                    comment.getCreatedDate()
+            );
+        }
+
         return new QuestionBoardCommentDto(
                 comment.getId(),
                 comment.getUser().getName(),
@@ -323,7 +328,7 @@ public class StudentQuestionBoardService {
         );
     }
 
-    //게시글 리스트
+    // 게시글 리스트
     public Page<QuestionBoardDto> getQuestionBoardList(String filterType, String subjectName, Curriculum curriculum, Pageable pageable) {
         if (filterType == null) {
             filterType = "default";
@@ -355,10 +360,7 @@ public class StudentQuestionBoardService {
     }
 
     private QuestionBoardDto convertToListDto(QuestionBoard questionBoard) {
-
-        //선생님이 글을 달았는지 안달았는지 여부를 추가해야함
         boolean isCommentHere = questionBoardRepository.hasTeacherComment(questionBoard);
-
         return new QuestionBoardDto(
                 questionBoard.getId(),
                 questionBoard.getSubject().getName(),
@@ -371,16 +373,9 @@ public class StudentQuestionBoardService {
         );
     }
 
-    // 최근 질문 5개
-    public List<QuestionTop5Dto> getQuestionTop5(String username) {
-        Curriculum curriculum = curriculumRepository.findCurriculumByUsername(username);
-        return questionBoardRepository.findQuestionTop5(curriculum);
-    }
-
     // 최근 질문 2개
-    public List<ViewQuestionBoardDto> getQuestionTop2(String username){
+    public List<ViewQuestionBoardDto> getQuestionTop2(String username) {
         Curriculum curriculum = curriculumRepository.findCurriculumByUsername(username);
         return questionBoardRepository.findQuestionTop2(curriculum);
     }
-
 }

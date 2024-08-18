@@ -74,7 +74,7 @@ public class StudentSurveyService {
             }
 
             surveyAnswerRepository.saveAll(answers);
-            notificationService.deleteSurveyNotification(survey);
+            notificationService.deleteSurveyNotification(student, survey);
             student.setSurveyCompleted(true);
             return true;
         } catch (Exception e) {

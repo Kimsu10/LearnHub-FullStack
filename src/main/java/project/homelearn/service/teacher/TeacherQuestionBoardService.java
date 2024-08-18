@@ -5,16 +5,11 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.http.ResponseEntity;
-import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
-import org.springframework.web.client.RestTemplate;
-import project.homelearn.dto.chatgpt.ChatGPTResponseDto;
 import project.homelearn.dto.common.board.QuestionBoardCommentDto;
 import project.homelearn.dto.common.board.QuestionBoardDetailDto;
 import project.homelearn.dto.common.board.QuestionBoardDto;
 import project.homelearn.dto.student.board.CommentWriteDto;
-import project.homelearn.dto.teacher.AiCommentWriteDto;
 import project.homelearn.dto.teacher.dashboard.QuestionTop5Dto;
 import project.homelearn.entity.board.QuestionBoard;
 import project.homelearn.entity.board.comment.QuestionBoardComment;
@@ -26,7 +21,6 @@ import project.homelearn.repository.curriculum.CurriculumRepository;
 import project.homelearn.repository.user.UserRepository;
 import project.homelearn.service.student.StudentNotificationService;
 
-import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -56,17 +50,6 @@ public class TeacherQuestionBoardService {
         // 학생에게 알림
         User student = questionBoard.getUser();
         studentNotificationService.questionResponseNotify(student, questionBoard, comment);
-    }
-
-    // AI 자동응답 작성
-    public void autoWriteComment(AiCommentWriteDto aiCommentWriteDto) {
-        QuestionBoard questionBoard = questionBoardRepository.findById(aiCommentWriteDto.getQuestionBoardId()).orElseThrow();
-
-        QuestionBoardComment comment = new QuestionBoardComment();
-        comment.setUser(null);
-        comment.setQuestionBoard(questionBoard);
-        comment.setContent(aiCommentWriteDto.getContent());
-        commentRepository.save(comment);
     }
 
     // 댓글 수정
@@ -142,52 +125,6 @@ public class TeacherQuestionBoardService {
         questionBoard.setCommentCount(questionBoard.getCommentCount() - 1);
     }
 
-    // 답변없는 게시물 탐색 스케줄링
-    @Scheduled(fixedRate = 3600000) // 1시간마다 실행
-    public void checkForUnansweredQuestions() {
-        List<QuestionBoard> unansweredQuestions = findUnansweredQuestionsWithin12Hours();
-
-        for (QuestionBoard question : unansweredQuestions) {
-            try {
-                // AI 답변 요청
-                String aiResponse = getAIResponse(question.getContent());
-
-                // 댓글 작성 DTO 생성 및 서비스 호출
-                AiCommentWriteDto aiCommentWriteDto = new AiCommentWriteDto(question.getId(), "AI", aiResponse);
-                autoWriteComment(aiCommentWriteDto);
-            } catch (Exception e) {
-                log.error("게시글 ID " + question.getId() + "에 대한 AI 응답 처리 중 오류 발생.", e);
-            }
-        }
-        log.info("스케줄링 호출");
-    }
-
-    // AI 답변 받아오기
-    private String getAIResponse(String prompt) {
-        String url = "http://localhost:8080/bot/chat?prompt=" + prompt; // AnswerBotController 엔드포인트 URL
-        log.info("request url: " + url);
-        RestTemplate restTemplate = new RestTemplate();
-
-        try {
-            ResponseEntity<ChatGPTResponseDto> response = restTemplate.getForEntity(url, ChatGPTResponseDto.class);
-            log.info("ai response: " + response.getBody());
-
-            if (response.getBody() != null && !response.getBody().getChoices().isEmpty()) {
-                log.info("ai response: " + response.getBody().getChoices());
-                return response.getBody().getChoices().get(0).getMessage().getContent();
-            }
-        } catch (Exception e) {
-            log.error("AI 응답을 가져오는 도중 오류가 발생했습니다.", e);
-        }
-        return "AI 응답을 가져오지 못했습니다.";
-    }
-
-    // 답변없는 게시글 불러오기
-    public List<QuestionBoard> findUnansweredQuestionsWithin12Hours() {
-        LocalDateTime twelveHoursAgo = LocalDateTime.now().minusHours(12);
-        return questionBoardRepository.findByCreatedDateBeforeAndCommentsIsNull(twelveHoursAgo);
-    }
-
     // 조회수 증가
     public void incrementViewCount(Long questionBoardId) {
         QuestionBoard questionBoard = questionBoardRepository.findById(questionBoardId).orElseThrow();
@@ -221,6 +158,16 @@ public class TeacherQuestionBoardService {
 
     // 댓글 Dto 변환
     public QuestionBoardCommentDto convertToCommentDto(QuestionBoardComment comment) {
+        User user = comment.getUser();
+        if (user == null) {
+            return new QuestionBoardCommentDto(
+                    comment.getId(),
+                    "ChatGPT",
+                    comment.getContent(),
+                    comment.getCreatedDate()
+            );
+        }
+
         return new QuestionBoardCommentDto(
                 comment.getId(),
                 comment.getUser().getName(),
@@ -233,7 +180,7 @@ public class TeacherQuestionBoardService {
         );
     }
 
-    //게시글 리스트
+    // 게시글 리스트
     public Page<QuestionBoardDto> getQuestionBoardList(String filterType, String subjectName, Curriculum curriculum, Pageable pageable) {
         if (filterType == null) {
             filterType = "default";
@@ -266,7 +213,6 @@ public class TeacherQuestionBoardService {
 
     private QuestionBoardDto convertToListDto(QuestionBoard questionBoard) {
 
-        //선생님이 글을 달았는지 안달았는지 여부를 추가해야함
         boolean isCommentHere = questionBoardRepository.hasTeacherComment(questionBoard);
 
         return new QuestionBoardDto(

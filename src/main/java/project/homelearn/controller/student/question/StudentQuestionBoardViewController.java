@@ -55,13 +55,13 @@ public class StudentQuestionBoardViewController {
         }
     }
 
-    // 글 상세보기
+    // 글 상세 조회
     @GetMapping("/{questionBoardId}")
     public ResponseEntity<?> viewQuestionBoard(@PathVariable("questionBoardId") Long questionBoardId) {
         QuestionBoardDetailDto viewQuestionBoard = studentQuestionBoardService.getQuestionBoard(questionBoardId);
 
         if (viewQuestionBoard != null) {
-            //조회수 증가
+            // 조회수 증가
             studentQuestionBoardService.incrementViewCount(questionBoardId);
             return new ResponseEntity<>(viewQuestionBoard, HttpStatus.OK);
         }
@@ -70,7 +70,7 @@ public class StudentQuestionBoardViewController {
         }
     }
 
-    // 글 상세보기 중 댓글들만 추출
+    // 글 상세 조회 중 댓글만 추출
     @GetMapping("/{questionBoardId}/comments")
     public ResponseEntity<?> viewComments(@PathVariable("questionBoardId") Long questionBoardId) {
         List<QuestionBoardCommentDto> viewComments = studentQuestionBoardService.getQuestionBoardComment(questionBoardId);
@@ -78,7 +78,7 @@ public class StudentQuestionBoardViewController {
         if (viewComments != null) {
             return new ResponseEntity<>(viewComments, HttpStatus.OK);
         }
-        else{
+        else {
             return new ResponseEntity<>("작성된 댓글이 없습니다.",HttpStatus.NOT_FOUND);
         }
     }

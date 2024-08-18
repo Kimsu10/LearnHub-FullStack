@@ -3,6 +3,7 @@ package project.homelearn.repository.board;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import project.homelearn.entity.board.FreeBoard;
@@ -16,4 +17,8 @@ public interface FreeBoardRepository extends JpaRepository<FreeBoard, Long> {
     Page<FreeBoard> findByCreatedDateDesc(@Param("curriculum") Curriculum curriculum, Pageable pageable);
 
     long countByUser(User user);
+
+    @Modifying
+    @Query("update FreeBoard fb set fb.viewCount = fb.viewCount + 1 where fb.id =:id")
+    void increaseViewCount(@Param("id") Long id);
 }

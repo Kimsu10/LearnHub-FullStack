@@ -117,6 +117,7 @@ public class ManagerCurriculumService {
         ObjectMetadata metadata = new ObjectMetadata();
         metadata.setContentLength(0);
         PutObjectRequest putObjectRequest = new PutObjectRequest(bucketName, folderName, new ByteArrayInputStream(new byte[0]), metadata);
+
         amazonS3Client.putObject(putObjectRequest);
     }
 

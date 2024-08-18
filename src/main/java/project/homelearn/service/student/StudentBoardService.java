@@ -247,7 +247,6 @@ public class StudentBoardService {
 
     // 조회수 증가
     public void incrementViewCount(Long boardId) {
-        FreeBoard freeBoard = boardRepository.findById(boardId).orElseThrow();
-        freeBoard.setViewCount(freeBoard.getViewCount() + 1);
+        boardRepository.increaseViewCount(boardId);
     }
 }
