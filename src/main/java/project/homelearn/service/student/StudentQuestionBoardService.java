@@ -361,16 +361,30 @@ public class StudentQuestionBoardService {
 
     private QuestionBoardDto convertToListDto(QuestionBoard questionBoard) {
         boolean isCommentHere = questionBoardRepository.hasTeacherComment(questionBoard);
-        return new QuestionBoardDto(
-                questionBoard.getId(),
-                questionBoard.getSubject().getName(),
-                questionBoard.getTitle(),
-                questionBoard.getUser().getName(),
-                questionBoard.getContent(),
-                questionBoard.getCreatedDate(),
-                questionBoard.getCommentCount(),
-                isCommentHere
-        );
+        Subject subject = questionBoard.getSubject();
+
+        if (subject == null) {
+            return new QuestionBoardDto(
+                    questionBoard.getId(),
+                    questionBoard.getUser().getName(),
+                    questionBoard.getContent(),
+                    questionBoard.getCreatedDate(),
+                    questionBoard.getCommentCount(),
+                    isCommentHere,
+                    questionBoard.getTitle()
+            );
+        } else {
+            return new QuestionBoardDto(
+                    questionBoard.getId(),
+                    questionBoard.getSubject().getName(),
+                    questionBoard.getTitle(),
+                    questionBoard.getUser().getName(),
+                    questionBoard.getContent(),
+                    questionBoard.getCreatedDate(),
+                    questionBoard.getCommentCount(),
+                    isCommentHere
+            );
+        }
     }
 
     // 최근 질문 2개

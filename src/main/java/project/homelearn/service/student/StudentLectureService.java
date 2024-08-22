@@ -69,22 +69,18 @@ public class StudentLectureService {
         return lectureRepository.findStudentLectureView(lectureId);
     }
 
-    // 학생의 강의 시청 기록 김수정
-    @Transactional
+    // 학생의 강의 시청 기록
     public Optional<StudentLectureDto> patchLastView(StudentLectureDto studentLectureDto) {
-        // lectureId와 username으로 엔티티 조회
         Optional<StudentLecture> optionalStudentLecture = studentLectureRepository.findByUserUsernameAndLectureId(
                 studentLectureDto.getUsername(), studentLectureDto.getLectureId());
 
         if (optionalStudentLecture.isPresent()) {
             StudentLecture studentLecture = optionalStudentLecture.get();
 
-            // lastPosition 업데이트
             if (studentLectureDto.getLastPosition() != null) {
                 studentLecture.setLastPosition(studentLectureDto.getLastPosition());
             }
 
-            // isCompleted와 completedDate 업데이트
             studentLecture.setCompleted(studentLectureDto.isCompleted());
 
             if (studentLectureDto.isCompleted()) {
@@ -95,7 +91,7 @@ public class StudentLectureService {
 
             studentLectureRepository.save(studentLecture);
 
-            // 변경된 엔티티를 다시 DTO로 변환하여 반환
+
             studentLectureDto.setStudentLectureId(studentLecture.getId());
             studentLectureDto.setLastPosition(studentLecture.getLastPosition());
             studentLectureDto.setCompleted(studentLecture.isCompleted());
