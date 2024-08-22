@@ -80,7 +80,10 @@ public class ManagerInquiryService {
                     inquiry.getTitle(),
                     inquiry.getContent(),
                     inquiry.getCreatedDate(),
-                    inquiry.getUser(),
+                    inquiry.getUser().getId(),
+                    inquiry.getUser().getName(),
+                    inquiry.getUser().getCurriculum().getName(),
+                    inquiry.getUser().getCurriculum().getTh(),
                     inquiry.getResponse(),
                     inquiry.getResponseDate()
             );
@@ -117,7 +120,10 @@ public class ManagerInquiryService {
                         managerInquiry.getTitle(),
                         managerInquiry.getContent(),
                         managerInquiry.getCreatedDate(),
-                        managerInquiry.getUser(),
+                        managerInquiry.getUser().getId(),
+                        managerInquiry.getUser().getName(),
+                        managerInquiry.getUser().getCurriculum().getName(),
+                        managerInquiry.getUser().getCurriculum().getTh(),
                         managerInquiry.getResponse() != null ? managerInquiry.getResponse() : null,
                         managerInquiry.getResponseDate() != null ? managerInquiry.getResponseDate() : null
                 ))

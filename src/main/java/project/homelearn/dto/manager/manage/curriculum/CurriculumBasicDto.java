@@ -12,6 +12,8 @@ import static java.lang.Math.round;
 @Data
 public class CurriculumBasicDto {
 
+    private Long curriculumId;
+
     @NotBlank
     private String name;
 
@@ -23,6 +25,14 @@ public class CurriculumBasicDto {
 
     @NotNull
     private LocalDate endDate;
+
+    public CurriculumBasicDto(Long curriculumId, String name, Long th, LocalDate startDate, LocalDate endDate) {
+        this.curriculumId = curriculumId;
+        this.name = name;
+        this.th = th;
+        this.startDate = startDate;
+        this.endDate = endDate;
+    }
 
     public CurriculumBasicDto(String name, Long th, LocalDate startDate, LocalDate endDate) {
         this.name = name;

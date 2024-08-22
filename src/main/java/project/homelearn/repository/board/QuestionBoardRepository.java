@@ -46,4 +46,12 @@ public interface QuestionBoardRepository extends JpaRepository<QuestionBoard, Lo
     @Modifying
     @Query("update QuestionBoard q set q.viewCount = q.viewCount + 1 where q.id = :id")
     void incrementViewCountById(@Param("id") Long id);
+
+    @Modifying
+    @Query("update QuestionBoard q set q.commentCount = q.commentCount + 1 where q.id = :id")
+    void incrementCommentCountById(@Param("id")Long id);
+
+    @Modifying
+    @Query("update QuestionBoard q set q.commentCount = q.commentCount - 1 where q.id = :id")
+    void decrementCommentCountById(@Param("id")Long id);
 }

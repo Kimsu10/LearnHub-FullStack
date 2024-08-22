@@ -33,13 +33,13 @@ public class QuestionBoardDto {
     @NotNull
     private boolean isCommentHere;
 
-    public QuestionBoardDto(Long questionBoardId, String name, String content, LocalDateTime createDate, int commentCount, boolean isCommentHere, String title) {
+    public QuestionBoardDto(Long questionBoardId, String title, String name, String content, LocalDateTime createDate, int commentCount, boolean isCommentHere) {
         this.questionBoardId = questionBoardId;
+        this.title = title;
         this.name = name;
         this.content = content;
         this.createDate = createDate;
         this.commentCount = commentCount;
         this.isCommentHere = isCommentHere;
-        this.title = title;
     }
 }

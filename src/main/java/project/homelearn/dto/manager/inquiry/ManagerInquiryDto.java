@@ -1,10 +1,10 @@
 package project.homelearn.dto.manager.inquiry;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Data;
-import project.homelearn.entity.user.User;
 
 import java.time.LocalDateTime;
 
@@ -22,10 +22,17 @@ public class ManagerInquiryDto {
     private String content;
 
     @NotNull
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm")
     private LocalDateTime createdDate;
 
     @NotNull
-    private User user;
+    private Long userId;
+
+    private String name;
+
+    private String curriculumName;
+
+    private Long curriculumTh;
 
     private String response;
 

@@ -42,6 +42,7 @@ public class AutoAnswerService {
                 comment.setQuestionBoard(question);
                 comment.setContent(response);
                 commentRepository.save(comment);
+                questionRepository.incrementCommentCountById(comment.getId());
             } catch (Exception e) {
                 log.error("게시글 ID {}에 대한 AI 응답 처리 중 오류 발생.", question.getId(), e);
             }
@@ -51,6 +52,7 @@ public class AutoAnswerService {
     // 답변없는 게시글 불러오기
     private List<QuestionBoard> findUnansweredQuestionsWithin12Hours() {
         LocalDateTime twelveHoursAgo = LocalDateTime.now().minusHours(12);
+        //LocalDateTime now  = LocalDateTime.now();
         return questionRepository.findByCreatedDateBeforeAndCommentsIsNull(twelveHoursAgo);
     }
 

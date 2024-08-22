@@ -7,7 +7,6 @@ import org.springframework.stereotype.Component;
 import project.homelearn.entity.manager.Manager;
 import project.homelearn.entity.student.badge.Badge;
 import project.homelearn.entity.survey.SurveyContent;
-import project.homelearn.entity.teacher.Teacher;
 import project.homelearn.repository.badge.BadgeRepository;
 import project.homelearn.repository.survey.SurveyContentRepository;
 import project.homelearn.repository.user.UserRepository;
@@ -16,7 +15,6 @@ import static project.homelearn.entity.student.badge.BadgeConstants.*;
 import static project.homelearn.entity.survey.QuestionType.RATING;
 import static project.homelearn.entity.survey.QuestionType.TEXT;
 import static project.homelearn.entity.user.Role.ROLE_MANAGER;
-import static project.homelearn.entity.user.Role.ROLE_TEACHER;
 
 @Component
 public class DataInitializer implements CommandLineRunner {
@@ -27,7 +25,6 @@ public class DataInitializer implements CommandLineRunner {
     private final BCryptPasswordEncoder passwordEncoder;
     private final BadgeRepository badgeRepository;
 
-    //
     public DataInitializer(@Value("${initial.password}") String password, UserRepository userRepository, SurveyContentRepository surveyContentRepository, BCryptPasswordEncoder passwordEncoder, BadgeRepository badgeRepository) {
         this.password = password;
         this.userRepository = userRepository;
@@ -44,14 +41,6 @@ public class DataInitializer implements CommandLineRunner {
             manager.setPassword(passwordEncoder.encode(password));
             manager.setRole(ROLE_MANAGER);
             userRepository.save(manager);
-        }
-
-        if (!userRepository.existsByUsername("teacher")) {
-            Teacher teacher = new Teacher();
-            teacher.setUsername("teacher");
-            teacher.setPassword(passwordEncoder.encode(password));
-            teacher.setRole(ROLE_TEACHER);
-            userRepository.save(teacher);
         }
 
         if (surveyContentRepository.count() == 0) {

@@ -200,7 +200,7 @@ public class ManagerCurriculumService {
         CurriculumBasicDto basicDto = curriculumRepository.findCurriculumBasic(curriculumId);
         Double progress = basicDto.calculateProgress();
 
-        return new CurriculumProgressDto(basicDto.getName(), basicDto.getTh(), progress);
+        return new CurriculumProgressDto(basicDto.getCurriculumId(), basicDto.getName(), basicDto.getTh(), progress, basicDto.getStartDate(), basicDto.getEndDate());
     }
 
     public CurriculumAttendanceDto getCurriculumAttendance(Long curriculumId) {

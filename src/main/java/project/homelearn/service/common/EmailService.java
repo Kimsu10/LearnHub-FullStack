@@ -46,12 +46,12 @@ public class EmailService {
             String html = "";
             if (type.equals(ENROLL)) {
                 html = templateEngine.process("email/codeEmailBeforeRegister", context);
-                helper.setSubject("[Home Learn] 회원가입 인증 코드");
+                helper.setSubject("[Learn Hub] 회원가입 인증 코드");
             }
 
             if (type.equals(RESET_PW)) {
                 html = templateEngine.process("email/codeEmailFindPassword", context);
-                helper.setSubject("[Home Learn] 비밀번호 재설정 인증 코드");
+                helper.setSubject("[Learn Hub] 비밀번호 재설정 인증 코드");
             }
 
             // 이메일 설정

@@ -19,7 +19,7 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
     @Override
     public void registerStompEndpoints(StompEndpointRegistry registry) {
         registry.addEndpoint("/gs-guide-websocket")
-                .setAllowedOrigins("http://localhost:3000")
+                .setAllowedOrigins("http://175.45.203.11:3000/", "http://localhost:3000")
                 .withSockJS();
     }
 }

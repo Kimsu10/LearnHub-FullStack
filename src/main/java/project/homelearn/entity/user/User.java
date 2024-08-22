@@ -18,6 +18,7 @@ import project.homelearn.entity.inquiry.TeacherInquiry;
 import project.homelearn.entity.notification.student.StudentNotification;
 import project.homelearn.entity.notification.teacher.TeacherNotification;
 import project.homelearn.entity.student.Attendance;
+import project.homelearn.entity.student.badge.StudentBadge;
 import project.homelearn.entity.survey.SurveyAnswer;
 import project.homelearn.entity.vote.StudentVote;
 
@@ -120,4 +121,7 @@ public abstract class User extends BaseEntity {
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<SurveyAnswer> surveyAnswers = new ArrayList<>();
+
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<StudentBadge> studentBadges = new ArrayList<>();
 }

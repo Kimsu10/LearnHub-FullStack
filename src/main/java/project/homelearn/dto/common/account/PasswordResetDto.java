@@ -15,5 +15,5 @@ public class PasswordResetDto {
             message = "비밀번호 규칙 검증 실패")
     private String password;
 
-//    private String recaptchaToken;
+    private String recaptcha;
 }

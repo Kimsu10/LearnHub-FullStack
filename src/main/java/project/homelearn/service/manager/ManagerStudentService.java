@@ -184,7 +184,7 @@ public class ManagerStudentService {
         CurriculumBasicDto basicDto = studentRepository.findStudentCurriculum(studentId);
         Double progress = basicDto.calculateProgress();
 
-        return new CurriculumProgressDto(basicDto.getName(), basicDto.getTh(), progress);
+        return new CurriculumProgressDto(basicDto.getName(), basicDto.getTh(), progress, basicDto.getStartDate(), basicDto.getEndDate());
     }
 
     public SpecificStudentDto getStudentBasic(Long studentId) {
