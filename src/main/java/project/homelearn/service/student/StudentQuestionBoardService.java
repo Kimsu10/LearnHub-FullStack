@@ -364,12 +364,12 @@ public class StudentQuestionBoardService {
         if (subject == null) {
             return new QuestionBoardDto(
                     questionBoard.getId(),
+                    questionBoard.getTitle(),
                     questionBoard.getUser().getName(),
                     questionBoard.getContent(),
                     questionBoard.getCreatedDate(),
                     questionBoard.getCommentCount(),
-                    isCommentHere,
-                    questionBoard.getTitle()
+                    isCommentHere
             );
         } else {
             return new QuestionBoardDto(
@@ -383,7 +383,8 @@ public class StudentQuestionBoardService {
                     isCommentHere
             );
         }
-    }
+}
+
 
     // 최근 질문 2개
     public List<ViewQuestionBoardDto> getQuestionTop2(String username) {
